@@ -1,9 +1,6 @@
 tasks:
   - command: gp open src/hello_world.cpp
 
-#image:
-#  file: .gitpod.Dockerfile
-
 github:
   prebuilds:
     # enable for the master/default branch (defaults to true)
