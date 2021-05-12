@@ -1,8 +1,12 @@
 # cmkr_for_beginners
 
-Try in your browser: [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/build-cpp/cmkr_for_beginners)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/build-cpp/cmkr_for_beginners)
 
 Repository for beginners to get started developing C++ with [cmkr](https://github.com/build-cpp/cmkr).
+
+## Try in your browser
+
+You can use the [Gitpod](https://gitpod.io/#https://github.com/build-cpp/cmkr_for_beginners) link to try this template in your browser.
 
 ## Building (IDE)
 
@@ -28,5 +32,5 @@ description = "A minimal cmkr project."
 
 [target.example]
 type = "executable"
-sources = ["src/main.cpp"]
+sources = ["src/hello_world.cpp"]
 ```
