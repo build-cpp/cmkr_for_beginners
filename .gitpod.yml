@@ -1,5 +1,6 @@
 tasks:
-  - command: gp open src/hello_world.cpp
+  - command: gp open "$GITPOD_REPO_ROOT/cmake.toml"
+  - command: gp open "$GITPOD_REPO_ROOT/src/hello_world.cpp"
 
 github:
   prebuilds:
@@ -8,16 +9,18 @@ github:
     # enable for all branches in this repo (defaults to false)
     branches: true
     # enable for pull requests coming from this repo (defaults to true)
-    pullRequests: true
+    pullRequests: false
     # enable for pull requests coming from forks (defaults to false)
     pullRequestsFromForks: false
     # add a "Review in Gitpod" button as a comment to pull requests (defaults to true)
     addComment: false
     # add a "Review in Gitpod" button to pull requests (defaults to false)
-    addBadge: true
+    addBadge: false
     # add a label once the prebuild is ready to pull requests (defaults to false)
     addLabel: prebuilt-in-gitpod
 
 vscode:
   extensions:
-    - ms-vscode.cmake-tools@1.6.0:lvoCR5usjseB5thI3sZhWA==
+    - ms-vscode.cmake-tools
+    - bungcip.better-toml
+    - llvm-vs-code-extensions.vscode-clangd

@@ -1,8 +1,10 @@
 include_guard()
 
 # Change these defaults to point to your infrastructure if desired
-set(CMKR_REPO "https://github.com/MoAlyousef/cmkr" CACHE STRING "cmkr git repository")
-set(CMKR_TAG "archive_7b7b2603" CACHE STRING "cmkr git tag (this needs to be available forever)")
+set(CMKR_REPO "https://github.com/build-cpp/cmkr" CACHE STRING "cmkr git repository" FORCE)
+set(CMKR_TAG "archive_9622334b" CACHE STRING "cmkr git tag (this needs to be available forever)" FORCE)
+
+# Set these from the command line to customize for development/debugging purposes
 set(CMKR_EXECUTABLE "" CACHE FILEPATH "cmkr executable")
 set(CMKR_SKIP_GENERATION OFF CACHE BOOL "skip automatic cmkr generation")
 
@@ -48,7 +50,7 @@ endif()
 set(CMKR_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_cmkr_${CMKR_TAG}")
 set(CMKR_CACHED_EXECUTABLE "${CMKR_DIRECTORY}/bin/${CMKR_EXECUTABLE_NAME}")
 
-if(NOT CMKR_CACHED_EXECUTABLE STREQUAL CMKR_EXECUTABLE AND CMKR_EXECUTABLE MATCHES "^${CMAKE_CURRENT_BINARY_DIR}")
+if(NOT CMKR_CACHED_EXECUTABLE STREQUAL CMKR_EXECUTABLE AND CMKR_EXECUTABLE MATCHES "^${CMAKE_CURRENT_BINARY_DIR}/_cmkr")
     message(AUTHOR_WARNING "[cmkr] Upgrading '${CMKR_EXECUTABLE}' to '${CMKR_CACHED_EXECUTABLE}'")
     unset(CMKR_EXECUTABLE CACHE)
 endif()
@@ -76,6 +78,7 @@ else()
     )
     message(STATUS "[cmkr] Building cmkr...")
     cmkr_exec("${CMAKE_COMMAND}"
+        --no-warn-unused-cli
         "${CMKR_DIRECTORY}"
         "-B${CMKR_DIRECTORY}/build"
         "-DCMAKE_BUILD_TYPE=Release"

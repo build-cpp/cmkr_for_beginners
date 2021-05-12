@@ -30,7 +30,7 @@ Under the hood cmkr generates the `CMakeLists.txt` required to build this projec
 name = "cmkr_for_beginners"
 description = "A minimal cmkr project."
 
-[target.example]
+[target.hello_world]
 type = "executable"
-sources = ["src/hello_world.cpp"]
+sources = ["src/main.cpp"]
 ```
