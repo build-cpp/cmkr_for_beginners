@@ -1,8 +1,6 @@
 # cmkr_for_beginners
 
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/build-cpp/cmkr_for_beginners)
-
-# cmkr_for_beginners
+Try in your browser: [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/build-cpp/cmkr_for_beginners)
 
 Repository for beginners to get started developing C++ with [cmkr](https://github.com/build-cpp/cmkr).
 
