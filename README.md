@@ -4,7 +4,7 @@
 
 Repository for beginners to get started developing C++ with [cmkr](https://github.com/build-cpp/cmkr).
 
-## Try in your browser
+## Try it in your browser!
 
 You can use the [Gitpod](https://gitpod.io/#https://github.com/build-cpp/cmkr_for_beginners) link to try this template in your browser.
 
