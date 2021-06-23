@@ -56,3 +56,4 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${hello_world_SOURCES})
 
 unset(CMKR_TARGET)
 unset(CMKR_SOURCES)
+
