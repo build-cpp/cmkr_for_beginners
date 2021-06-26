@@ -1,6 +1,6 @@
 tasks:
   - command: gp open "$GITPOD_REPO_ROOT/cmake.toml"
-  - command: gp open "$GITPOD_REPO_ROOT/src/hello_world.cpp"
+  - command: gp open "$GITPOD_REPO_ROOT/src/main.cpp"
 
 github:
   prebuilds:
