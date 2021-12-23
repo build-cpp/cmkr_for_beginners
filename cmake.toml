@@ -1,3 +1,4 @@
+# Reference: https://build-cpp.github.io/cmkr/cmake-toml
 [project]
 name = "cmkr_for_beginners"
 description = "A minimal cmkr project."

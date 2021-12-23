@@ -1,16 +1,22 @@
 include_guard()
 
+if(CMAKE_SCRIPT_MODE_FILE)
+    message(FATAL_ERROR "Running cmkr.cmake as a script is unsupported. To build your project try: cmake -B build")
+endif()
+
 # Change these defaults to point to your infrastructure if desired
 set(CMKR_REPO "https://github.com/build-cpp/cmkr" CACHE STRING "cmkr git repository" FORCE)
-set(CMKR_TAG "archive_760b2a85" CACHE STRING "cmkr git tag (this needs to be available forever)" FORCE)
+set(CMKR_TAG "archive_04bf40a5" CACHE STRING "cmkr git tag (this needs to be available forever)" FORCE)
 
 # Set these from the command line to customize for development/debugging purposes
 set(CMKR_EXECUTABLE "" CACHE FILEPATH "cmkr executable")
 set(CMKR_SKIP_GENERATION OFF CACHE BOOL "skip automatic cmkr generation")
+set(CMKR_BUILD_TYPE "Debug" CACHE STRING "cmkr build configuration")
 
 # Disable cmkr if generation is disabled
-if(DEFINED ENV{CI} OR CMKR_SKIP_GENERATION)
+if(DEFINED ENV{CI} OR CMKR_SKIP_GENERATION OR CMKR_BUILD_SKIP_GENERATION)
     message(STATUS "[cmkr] Skipping automatic cmkr generation")
+    unset(CMKR_BUILD_SKIP_GENERATION CACHE)
     macro(cmkr)
     endmacro()
     return()
@@ -47,18 +53,45 @@ else()
 endif()
 
 # Use cached cmkr if found
-set(CMKR_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_cmkr_${CMKR_TAG}")
+if(DEFINED ENV{CMKR_CACHE} AND EXISTS "$ENV{CMKR_CACHE}")
+    set(CMKR_DIRECTORY_PREFIX "$ENV{CMKR_CACHE}")
+    string(REPLACE "\\" "/" CMKR_DIRECTORY_PREFIX "${CMKR_DIRECTORY_PREFIX}")
+    if(NOT CMKR_DIRECTORY_PREFIX MATCHES "\\/$")
+        set(CMKR_DIRECTORY_PREFIX "${CMKR_DIRECTORY_PREFIX}/")
+    endif()
+else()
+    set(CMKR_DIRECTORY_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_cmkr_")
+endif()
+set(CMKR_DIRECTORY "${CMKR_DIRECTORY_PREFIX}${CMKR_TAG}")
 set(CMKR_CACHED_EXECUTABLE "${CMKR_DIRECTORY}/bin/${CMKR_EXECUTABLE_NAME}")
 
-if(NOT CMKR_CACHED_EXECUTABLE STREQUAL CMKR_EXECUTABLE AND CMKR_EXECUTABLE MATCHES "^${CMAKE_CURRENT_BINARY_DIR}/_cmkr")
-    message(AUTHOR_WARNING "[cmkr] Upgrading '${CMKR_EXECUTABLE}' to '${CMKR_CACHED_EXECUTABLE}'")
-    unset(CMKR_EXECUTABLE CACHE)
+# Handle upgrading logic
+if(CMKR_EXECUTABLE AND NOT CMKR_CACHED_EXECUTABLE STREQUAL CMKR_EXECUTABLE)    
+    if(CMKR_EXECUTABLE MATCHES "^${CMAKE_CURRENT_BINARY_DIR}/_cmkr")
+        if(DEFINED ENV{CMKR_CACHE} AND EXISTS "$ENV{CMKR_CACHE}")
+            message(AUTHOR_WARNING "[cmkr] Switching to cached cmkr: '${CMKR_CACHED_EXECUTABLE}'")
+            if(EXISTS "${CMKR_CACHED_EXECUTABLE}")
+                set(CMKR_EXECUTABLE "${CMKR_CACHED_EXECUTABLE}" CACHE FILEPATH "Full path to cmkr executable" FORCE)
+            else()
+                unset(CMKR_EXECUTABLE CACHE)
+            endif()
+        else()
+            message(AUTHOR_WARNING "[cmkr] Upgrading '${CMKR_EXECUTABLE}' to '${CMKR_CACHED_EXECUTABLE}'")
+            unset(CMKR_EXECUTABLE CACHE)
+        endif()
+    elseif(DEFINED ENV{CMKR_CACHE} AND EXISTS "$ENV{CMKR_CACHE}" AND CMKR_EXECUTABLE MATCHES "^${CMKR_DIRECTORY_PREFIX}")
+        message(AUTHOR_WARNING "[cmkr] Upgrading cached '${CMKR_EXECUTABLE}' to '${CMKR_CACHED_EXECUTABLE}'")
+        unset(CMKR_EXECUTABLE CACHE)
+    endif()
 endif()
 
 if(CMKR_EXECUTABLE AND EXISTS "${CMKR_EXECUTABLE}")
     message(VERBOSE "[cmkr] Found cmkr: '${CMKR_EXECUTABLE}'")
 elseif(CMKR_EXECUTABLE AND NOT CMKR_EXECUTABLE STREQUAL CMKR_CACHED_EXECUTABLE)
     message(FATAL_ERROR "[cmkr] '${CMKR_EXECUTABLE}' not found")
+elseif(NOT CMKR_EXECUTABLE AND EXISTS "${CMKR_CACHED_EXECUTABLE}")
+    set(CMKR_EXECUTABLE "${CMKR_CACHED_EXECUTABLE}" CACHE FILEPATH "Full path to cmkr executable" FORCE)
+    message(STATUS "[cmkr] Found cached cmkr: '${CMKR_EXECUTABLE}'")
 else()
     set(CMKR_EXECUTABLE "${CMKR_CACHED_EXECUTABLE}" CACHE FILEPATH "Full path to cmkr executable" FORCE)
     message(VERBOSE "[cmkr] Bootstrapping '${CMKR_EXECUTABLE}'")
@@ -76,23 +109,24 @@ else()
         ${CMKR_REPO}
         "${CMKR_DIRECTORY}"
     )
-    message(STATUS "[cmkr] Building cmkr...")
+    message(STATUS "[cmkr] Building cmkr (using system compiler)...")
     cmkr_exec("${CMAKE_COMMAND}"
         --no-warn-unused-cli
         "${CMKR_DIRECTORY}"
         "-B${CMKR_DIRECTORY}/build"
-        "-DCMAKE_BUILD_TYPE=Release"
+        "-DCMAKE_BUILD_TYPE=${CMKR_BUILD_TYPE}"
+        "-DCMAKE_UNITY_BUILD=ON"
         "-DCMAKE_INSTALL_PREFIX=${CMKR_DIRECTORY}"
         "-DCMKR_GENERATE_DOCUMENTATION=OFF"
     )
     cmkr_exec("${CMAKE_COMMAND}"
         --build "${CMKR_DIRECTORY}/build"
-        --config Release
+        --config "${CMKR_BUILD_TYPE}"
         --parallel
     )
     cmkr_exec("${CMAKE_COMMAND}"
         --install "${CMKR_DIRECTORY}/build"
-        --config Release
+        --config "${CMKR_BUILD_TYPE}"
         --prefix "${CMKR_DIRECTORY}"
         --component cmkr
     )
